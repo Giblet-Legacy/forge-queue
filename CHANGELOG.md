@@ -4,7 +4,8 @@
 
 ### Good
 - `fq.py` implemented in ~4KB, stdlib only.
-- Kill test passed in 24 minutes on an S24 phone in Termux.
+- Kill test passed on an S24 phone in Termux. End-to-end build
+  time (spec to push): 40 minutes.
 - 3 jobs enqueued, worker killed mid-work, restarted, all 3 reclaimed
   and completed exactly once. `jobs=3 results=3 done=3 mismatched=0`.
 - Atomic claim via `BEGIN IMMEDIATE`, work outside lock, atomic
@@ -32,3 +33,8 @@
 - README paste got killed by the buffer twice; kill test PASSED but
   took a third attempt to record. Lesson: write docs in small chunks,
   or via Python with chr(96) for fences.
+- First CHANGELOG draft said "24 minutes" because that was the time at
+  which the kill test PASSED. It took another ~16 minutes to write the
+  docs, fix the buffer-broken files, and push. Corrected to 40 minutes
+  before pushing. The "faster" number was flattering but wrong; the
+  git timestamps would have caught it.
