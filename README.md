@@ -1,7 +1,7 @@
 # forge-queue
 
-A tiny job queue built only on Python's standard library (```sqlite3```,
-```time```, ```uuid```, ```os```, ```argparse```), built and tested on a phone in Termux.
+A tiny job queue built only on Python's standard library (`sqlite3`,
+`time`, `uuid`, `os`, `argparse`), built and tested on a phone in Termux.
 
 ## The challenge
 
@@ -15,7 +15,7 @@ Test procedure:
 
 1. Enqueue jobs from terminal A.
 2. Run a worker in terminal B.
-3. ```kill -9``` the worker halfway through a job.
+3. `kill -9` the worker halfway through a job.
 4. Restart the worker.
 5. Verify: every job completes, none is lost, and none is recorded twice.
 
@@ -24,7 +24,7 @@ Test procedure:
 "Nothing should run twice" can't be fully guaranteed, and that's the point.
 
 A worker can be killed at any point, including **after the work is done
-but before ```done``` is committed**. No queue can tell "died before the
+but before `done` is committed**. No queue can tell "died before the
 work" apart from "died after the work, before the commit". Real systems
 (SQS, Kafka, Celery) promise *at-least-once delivery* plus
 *effectively-once results*, never exactly-once execution.
@@ -37,10 +37,10 @@ mark it done.
 
 | Guarantee | How |
 |---|---|
-| **No job is lost** | A claimed job is always either ```done``` or reclaimable once its lease runs out (10s). |
-| **Each result is recorded exactly once** | The result row and ```status='done'``` commit in the same transaction. |
-| **A late worker can't double-commit** | Fencing: finish only commits if ```worker_id``` and ```locked_at``` still match. Otherwise ```ROLLBACK``` and log ```[LOST LEASE]```. |
-| **Execution is at-least-once** | Stated honestly. Side effects outside the DB must be idempotent on ```job_id```. |
+| **No job is lost** | A claimed job is always either `done` or reclaimable once its lease runs out (10s). |
+| **Each result is recorded exactly once** | The result row and `status='done'` commit in the same transaction. |
+| **A late worker can't double-commit** | Fencing: finish only commits if `worker_id` and `locked_at` still match. Otherwise `ROLLBACK` and log `[LOST LEASE]`. |
+| **Execution is at-least-once** | Stated honestly. Side effects outside the DB must be idempotent on `job_id`. |
 
 ## Design
 
@@ -57,12 +57,12 @@ CREATE TABLE results (
 
 Worker loop:
 
-1. **Claim:** ```BEGIN IMMEDIATE```, pick oldest ```pending``` or ```running```
-   with expired lease, set ```running``` + ```worker_id``` + ```locked_at```, ```COMMIT```.
+1. **Claim:** `BEGIN IMMEDIATE`, pick oldest `pending` or `running`
+   with expired lease, set `running` + `worker_id` + `locked_at`, `COMMIT`.
 2. **Work:** outside any transaction.
-3. **Finish:** ```BEGIN IMMEDIATE```, ```UPDATE ... SET status='done'
+3. **Finish:** `BEGIN IMMEDIATE`, ```UPDATE ... SET status='done'
    WHERE id=? AND worker_id=? AND locked_at=?```. 1 row → insert
-   result, ```COMMIT```. 0 rows → ```ROLLBACK``` (lost lease).
+   result, `COMMIT`. 0 rows → `ROLLBACK` (lost lease).
 
 ## Kill test - 2026-11-13 on the S24
 
@@ -109,18 +109,18 @@ jobs=3 results=3 done=3 mismatched=0
 PASS
 ```
 
-24 minutes from "start the clock" to PASS, on a phone.
+40 minutes from "start the clock" to PASS, on a phone.
 
 ## Status
 
 - [x] Spec and design
-- [x] Implementation (```fq.py```)
+- [x] Implementation (`fq.py`)
 - [x] kill -9 test on device, with output logged here
 - [ ] Lost-lease test (job time > timeout, two workers)
 
 ## Honest limits
 
-- ```LOCK_TIMEOUT``` (10s) must exceed worst-case job time, or the
+- `LOCK_TIMEOUT` (10s) must exceed worst-case job time, or the
   reaper reclaims a still-working job. Fencing prevents double-commit
   but not double-work. Production would add lease heartbeat renewal.
 - At-least-once execution. Effectively-once results. Never
@@ -145,3 +145,5 @@ This project was built under a strict timebox and hardware constraint.
 - **Process:** Pair-programmed with an AI assistant via a chat interface.
 
 The entire architecture — from the initial spec to the SQLite fencing tokens and the `kill -9` test — was designed and typed on a mobile phone keyboard.
+
+
