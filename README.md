@@ -125,3 +125,23 @@ PASS
   but not double-work. Production would add lease heartbeat renewal.
 - At-least-once execution. Effectively-once results. Never
   exactly-once.
+
+
+---
+
+## Build Provenance
+
+This project was built under a strict timebox and hardware constraint. 
+
+**The Challenge:**
+> "Stdlib only: a tiny job queue on sqlite3. Enqueue from one terminal, run a worker in another. Kill the worker halfway through a job and restart it. Nothing should run twice and nothing should get lost. Sounds easy until you actually try it" 
+> — Yura Holovatyy, LinkedIn
+
+**The Constraints:**
+- **Time:** 40 minutes from "start the clock" to `git push`.
+- **Hardware:** Samsung S24 (Android).
+- **Environment:** Termux (no laptop, no IDE).
+- **Dependencies:** Python 3 Standard Library only (`sqlite3`, `uuid`, `time`, `argparse`, `os`).
+- **Process:** Pair-programmed with an AI assistant via a chat interface.
+
+The entire architecture — from the initial spec to the SQLite fencing tokens and the `kill -9` test — was designed and typed on a mobile phone keyboard.
